@@ -75,6 +75,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	// iOS 7
     UIViewController *_applicationTopViewController;
     int _previousModalPresentationStyle;
+    void (^_longPressHandler)(UILongPressGestureRecognizer *);
 }
 
 // Private Properties
@@ -185,6 +186,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
         _arrowButtonsChangePhotosAnimated = YES;
 
+        _backgroudAlpha = 1.0;
         _backgroundScaleFactor = 1.0;
         _animationDuration = 0.28;
         _senderViewForAnimation = nil;
@@ -270,8 +272,12 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [super didReceiveMemoryWarning];
 }
 
-#pragma mark - Pan Gesture
-
+#pragma mark - Gesture
+- (void)longPressGestureRecognized:(id)sender {
+    if(_longPressHandler){
+        _longPressHandler((UILongPressGestureRecognizer *)sender);
+    }
+}
 - (void)panGestureRecognized:(id)sender {
     // Initial Setup
     IDMZoomingScrollView *scrollView = [self pageDisplayedAtIndex:_currentPageIndex];
@@ -596,7 +602,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
 - (void)viewDidLoad {
     // View
-	self.view.backgroundColor = [UIColor colorWithWhite:(_useWhiteBackgroundColor ? 1 : 0) alpha:1];
+	self.view.backgroundColor = [UIColor colorWithWhite:(_useWhiteBackgroundColor ? 1 : 0) alpha:_backgroudAlpha];
 
     self.view.clipsToBounds = YES;
 
@@ -702,6 +708,9 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognized:)];
     [_panGesture setMinimumNumberOfTouches:1];
     [_panGesture setMaximumNumberOfTouches:1];
+    
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPressGestureRecognized:)];
+    [self.view addGestureRecognizer:longPress];
 
     // Update
     //[self reloadData];
@@ -709,6 +718,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	// Super
     [super viewDidLoad];
 }
+
+
 
 - (void)viewWillAppear:(BOOL)animated {
     // Update
@@ -1330,6 +1341,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         [self jumpToPageAtIndex:index];
         if (!_viewIsActive) [self tilePages]; // Force tiling if view is not visible
     }
+}
+
+- (void)setLongPressHandler:(void (^)(UILongPressGestureRecognizer *))handler{
+    _longPressHandler = handler;
 }
 
 #pragma mark - Buttons

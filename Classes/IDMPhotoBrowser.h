@@ -50,6 +50,7 @@
 @property (nonatomic, weak) UIImage *doneButtonImage;
 @property (nonatomic, weak) UIColor *trackTintColor, *progressTintColor;
 @property (nonatomic, assign) CGFloat doneButtonRightInset, doneButtonTopInset;
+@property (nonatomic, assign) CGFloat backgroudAlpha;
 @property (nonatomic, assign) CGSize doneButtonSize;
 
 @property (nonatomic, weak) UIImage *scaleImage;
@@ -92,5 +93,6 @@
 
 // Get IDMPhoto at index
 - (id<IDMPhoto>)photoAtIndex:(NSUInteger)index;
+- (void)setLongPressHandler:(void(^)(UILongPressGestureRecognizer *gesture))handler;
 
 @end
